@@ -12,7 +12,15 @@ macOS 14+ · Apple Silicon · 纯 Swift 主程序，零 Swift 依赖
 
 > 背景音乐是用 `Scripts/make_music.py` 合成的正弦波和弦，没有版权问题。
 
-![演示](Demo/cards/03-片尾.png)
+## 界面
+
+**转写中** —— 对方说的话逐句出现，随时可选中复制：
+
+![转写中](docs/screenshots/02-转写中.png)
+
+**字幕浮窗** —— 半透明、置顶、可鼠标穿透，叠在会议窗口上：
+
+![字幕浮窗](docs/screenshots/03-字幕浮窗.png)
 
 ---
 
