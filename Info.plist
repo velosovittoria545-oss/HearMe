@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>zh_CN</string>
+    <key>CFBundleExecutable</key>
+    <string>HearMe</string>
+    <key>CFBundleIdentifier</key>
+    <string>local.hearme.app</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>HearMe</string>
+    <key>CFBundleDisplayName</key>
+    <string>合秘</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.productivity</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>合秘 HearMe 需要麦克风，用于把你自己在会议中的发言一并转成文字。音频只在本机处理。</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>合秘 HearMe 使用 Apple 离线语音识别，把会议对话实时转成文字。音频不会离开这台电脑。</string>
+    <key>NSScreenCaptureUsageDescription</key>
+    <string>合秘 HearMe 需要「屏幕与系统录音」权限来读取系统音频，从而抓取腾讯会议、飞书、Zoom 等应用播放的声音。它不会录制或查看你的屏幕画面。</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Local tool · audio never leaves this Mac</string>
+</dict>
+</plist>

@@ -1,0 +1,18 @@
+# 构建产物
+.build/
+*.app
+
+# 本地签名证书（含私钥，绝不提交）
+.signing/
+
+# Python 虚拟环境
+.venv/
+__pycache__/
+*.pyc
+
+# 系统文件
+.DS_Store
+
+# 演示片中间文件（成品在 Demo/recording/）
+Demo/voice/
+Demo/voice-mix.wav
