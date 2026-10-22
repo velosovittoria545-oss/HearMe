@@ -67,3 +67,17 @@ codesign --force --deep "${SIGN_ARGS[@]}" \
 
 echo "==> 完成: $APP"
 codesign -dv "$APP" 2>&1 | grep -E "Identifier|Authority|Signature" | sed 's/^/    /'
+
+# ---------------------------------------------------------------
+# 打发布包：./build.sh --release
+# 生成 dist/HearMe-<版本>-macOS.zip
+# 用 --norsrc 去掉 __MACOSX 资源分支垃圾，包体更小、解压更干净
+# ---------------------------------------------------------------
+if [ "${1:-}" = "--release" ]; then
+  VERSION=$(plutil -extract CFBundleShortVersionString raw Info.plist 2>/dev/null || echo "1.0.0")
+  mkdir -p dist
+  rm -f "dist/HearMe-${VERSION}-macOS.zip"
+  echo "==> 打包 dist/HearMe-${VERSION}-macOS.zip"
+  ditto -c -k --norsrc --keepParent "$APP" "dist/HearMe-${VERSION}-macOS.zip"
+  ls -lh "dist/HearMe-${VERSION}-macOS.zip"
+fi
