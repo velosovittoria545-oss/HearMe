@@ -16,3 +16,5 @@ __pycache__/
 # 演示片中间文件（成品在 Demo/recording/）
 Demo/voice/
 Demo/voice-mix.wav
+Demo/narration/
+Demo/narration-mix.wav
