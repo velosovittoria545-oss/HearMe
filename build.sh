@@ -8,22 +8,39 @@ APP_NAME="HearMe"
 BUILD=".build"
 APP="$BUILD/$APP_NAME.app"
 SDK="$(xcrun --sdk macosx --show-sdk-path)"
-TARGET="arm64-apple-macos14.0"
+# 默认编译 Universal（Intel + Apple Silicon）
+# 只想要本机架构可传 ARCHS=arm64 ./build.sh
+ARCHS="${ARCHS:-arm64 x86_64}"
 IDENTITY="HearMe Local Dev"
 export TMPDIR="$PWD/$BUILD/tmp"
 mkdir -p "$BUILD/tmp" "$BUILD/modcache" "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
-echo "==> 编译 (SDK: $SDK)"
-swiftc \
-  -sdk "$SDK" \
-  -target "$TARGET" \
-  -module-cache-path "$BUILD/modcache" \
-  -O \
-  -parse-as-library \
-  -framework AppKit -framework SwiftUI -framework AVFoundation \
-  -framework Speech -framework ScreenCaptureKit -framework CoreMedia \
-  Sources/*.swift \
-  -o "$APP/Contents/MacOS/$APP_NAME"
+echo "==> 编译 (SDK: $SDK, 架构: $ARCHS)"
+BINARIES=()
+for ARCH in $ARCHS; do
+  OUT_BIN="$BUILD/$APP_NAME-$ARCH"
+  echo "    - $ARCH"
+  swiftc \
+    -sdk "$SDK" \
+    -target "${ARCH}-apple-macos14.0" \
+    -module-cache-path "$BUILD/modcache" \
+    -O \
+    -parse-as-library \
+    -framework AppKit -framework SwiftUI -framework AVFoundation \
+    -framework Speech -framework ScreenCaptureKit -framework CoreMedia \
+    Sources/*.swift \
+    -o "$OUT_BIN"
+  BINARIES+=("$OUT_BIN")
+done
+
+if [ ${#BINARIES[@]} -gt 1 ]; then
+  echo "==> 合并为 Universal"
+  lipo -create "${BINARIES[@]}" -output "$APP/Contents/MacOS/$APP_NAME"
+  rm -f "${BINARIES[@]}"
+else
+  cp "${BINARIES[0]}" "$APP/Contents/MacOS/$APP_NAME"
+  rm -f "${BINARIES[0]}"
+fi
 
 echo "==> 打包"
 cp Info.plist "$APP/Contents/Info.plist"

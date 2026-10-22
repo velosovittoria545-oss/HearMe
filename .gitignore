@@ -19,3 +19,6 @@ Demo/voice-mix.wav
 Demo/narration/
 Demo/narration-mix.wav
 Demo/music.wav
+
+# 发布产物（通过 GitHub Release 分发，不入库）
+dist/

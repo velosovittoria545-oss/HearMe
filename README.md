@@ -41,10 +41,24 @@ macOS 14+ · Apple Silicon · 纯 Swift 主程序，零 Swift 依赖
 
 ---
 
-## 快速开始
+## 安装
+
+**方式一：直接下载**（推荐，不用编译）
+
+去 [Releases](https://github.com/velosovittoria545-oss/HearMe/releases) 下载 `HearMe-1.0.0-macOS.zip`，
+解压后把 `HearMe.app` 拖进「应用程序」，然后在终端跑一次：
 
 ```bash
-git clone <repo> && cd HearMe
+xattr -cr /Applications/HearMe.app
+```
+
+> 没签 Apple 开发者证书，首次打开会被 Gatekeeper 拦。详细说明和替代方法见 **[INSTALL.md](INSTALL.md)**。
+
+**方式二：自己编译**（只需 Command Line Tools，不需要完整 Xcode）
+
+```bash
+git clone git@github.com:velosovittoria545-oss/HearMe.git
+cd HearMe
 ./build.sh                    # 编译 + 打包 + 自签名
 open .build/HearMe.app       # 首次运行会请求两个权限
 ```
