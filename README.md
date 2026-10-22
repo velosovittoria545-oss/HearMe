@@ -8,7 +8,9 @@
 macOS 14+ · Apple Silicon · 纯 Swift 主程序，零 Swift 依赖
 （Whisper 精修是可选功能，需要本地 Python + mlx-whisper）
 
-**▶ [看演示片（55 秒）](Demo/recording/合秘HearMe-演示片.mp4)**
+**▶ [看演示片（55 秒，带解说和背景音乐）](Demo/recording/合秘HearMe-演示片.mp4)**
+
+> 背景音乐是用 `Scripts/make_music.py` 合成的正弦波和弦，没有版权问题。
 
 ![演示](Demo/cards/03-片尾.png)
 
