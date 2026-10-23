@@ -164,8 +164,17 @@ struct CaptionView: View {
                 Picker("显示行数", selection: $captionLines) {
                     Text("1 行").tag(1); Text("2 行").tag(2); Text("3 行").tag(3); Text("5 行").tag(5)
                 }
-                Picker("字号", selection: $captionFontSize) {
-                    Text("小").tag(16.0); Text("中").tag(19.0); Text("大").tag(23.0); Text("特大").tag(28.0)
+                Menu("字号：\(Int(captionFontSize))") {
+                    Button("放大 (+1)") {
+                        captionFontSize = min(captionFontSize + 1, 48)
+                    }
+                    Button("缩小 (-1)") {
+                        captionFontSize = max(captionFontSize - 1, 12)
+                    }
+                    Divider()
+                    ForEach([14.0, 16.0, 19.0, 23.0, 28.0, 34.0, 40.0], id: \.self) { v in
+                        Button("\(Int(v)) pt") { captionFontSize = v }
+                    }
                 }
                 Slider(value: $captionOpacity, in: 0.3...1.0) { Text("背景不透明度") }
                 Divider()

@@ -160,7 +160,8 @@ private struct ContentBody: View {
             liveText: store.liveText,
             fontSize: state.fontSize,
             isRunning: state.isRunning,
-            autoScroll: $autoScroll
+            autoScroll: $autoScroll,
+            onMagnify: { delta in state.adjustFontSize(delta) }
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .topTrailing) {
@@ -203,6 +204,35 @@ private struct ContentBody: View {
                 Label("自动滚动", systemImage: "arrow.down.to.line")
             }
             .toggleStyle(.checkbox)
+
+            Divider().frame(height: 14)
+
+            // 字号调节：⌘+ / ⌘-
+            HStack(spacing: 2) {
+                Button {
+                    state.adjustFontSize(-1)
+                } label: {
+                    Image(systemName: "textformat.size.smaller")
+                }
+                .buttonStyle(.borderless)
+                .disabled(state.fontSize <= AppState.fontSizeRange.lowerBound)
+                .help("缩小字号（⌘-）")
+
+                Text("\(Int(state.fontSize))")
+                    .font(.callout.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .frame(minWidth: 22)
+                    .help("当前正文字号")
+
+                Button {
+                    state.adjustFontSize(1)
+                } label: {
+                    Image(systemName: "textformat.size.larger")
+                }
+                .buttonStyle(.borderless)
+                .disabled(state.fontSize >= AppState.fontSizeRange.upperBound)
+                .help("放大字号（⌘+）")
+            }
 
             Divider().frame(height: 14)
 

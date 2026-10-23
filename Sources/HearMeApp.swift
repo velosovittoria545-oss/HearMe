@@ -31,6 +31,21 @@ struct HearMeApp: App {
         .windowToolbarStyle(.unifiedCompact)
         .commands {
             CommandGroup(replacing: .newItem) {}
+            // 放进系统「显示」菜单，和 macOS 其他 App 的习惯一致
+            CommandGroup(after: .sidebar) {
+                Divider()
+                Button("放大字号") { state.adjustFontSize(1) }
+                    .keyboardShortcut("=", modifiers: [.command])
+                Button("缩小字号") { state.adjustFontSize(-1) }
+                    .keyboardShortcut("-", modifiers: [.command])
+                Button("实际大小") { state.resetFontSize() }
+                    .keyboardShortcut("0", modifiers: [.command])
+                Divider()
+                Button("字幕放大") { state.adjustCaptionFontSize(1) }
+                    .keyboardShortcut("=", modifiers: [.command, .shift])
+                Button("字幕缩小") { state.adjustCaptionFontSize(-1) }
+                    .keyboardShortcut("-", modifiers: [.command, .shift])
+            }
             CommandMenu("转写") {
                 Button("开始 / 停止") { state.toggle() }
                     .keyboardShortcut("l", modifiers: [.command, .shift])

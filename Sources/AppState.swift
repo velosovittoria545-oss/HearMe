@@ -15,6 +15,7 @@ final class AppState: ObservableObject {
     @AppStorage("captureMic") var captureMic: Bool = false
     @AppStorage("showCaptionPanel") var showCaptionPanel: Bool = false
     @AppStorage("fontSize") var fontSize: Double = 15
+    @AppStorage("captionFontSize") var captionFontSize: Double = 19
     /// 每句定稿就自动把最新全文放进剪贴板（随时 ⌘V 就是最新内容）
     @AppStorage("autoCopy") var autoCopy: Bool = false
     @AppStorage("autoCopyScope") var autoCopyScope: String = "latest"  // latest | all
@@ -346,6 +347,32 @@ final class AppState: ObservableObject {
         }
     }
 
+    // MARK: 字号
+
+    /// 正文字号范围。下限 11 保证可读，上限 40 够大字模式
+    static let fontSizeRange: ClosedRange<Double> = 11...40
+    static let captionFontSizeRange: ClosedRange<Double> = 12...48
+
+    func adjustFontSize(_ delta: Double) {
+        let next = (fontSize + delta).clamped(to: Self.fontSizeRange)
+        guard next != fontSize else { return }
+        fontSize = next
+        status = "正文字号 \(Int(next))"
+    }
+
+    func resetFontSize() {
+        fontSize = 15
+        status = "正文字号已重置"
+    }
+
+    /// 浮窗字号单独调（浮窗在会议时可能离得远，需要更大）
+    func adjustCaptionFontSize(_ delta: Double) {
+        let next = (captionFontSize + delta).clamped(to: Self.captionFontSizeRange)
+        guard next != captionFontSize else { return }
+        captionFontSize = next
+        status = "字幕字号 \(Int(next))"
+    }
+
     // MARK: 剪贴板
 
     /// 自动复制：默认关。开了之后每句定稿就写剪贴板，
@@ -507,5 +534,12 @@ final class AppState: ObservableObject {
                 let db = (try? b.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
                 return da > db
             }
+    }
+}
+
+extension Double {
+    /// 把数值夹在闭区间内
+    func clamped(to range: ClosedRange<Double>) -> Double {
+        Swift.min(Swift.max(self, range.lowerBound), range.upperBound)
     }
 }

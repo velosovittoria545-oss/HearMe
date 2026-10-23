@@ -16,6 +16,8 @@ struct PlainTextPane: NSViewRepresentable {
     let isRunning: Bool
     /// 内容变化时是否跟随滚动（用户正在选择时会自动关掉）
     @Binding var autoScroll: Bool
+    /// 触控板捏合调字号（正数放大，负数缩小）
+    var onMagnify: ((Double) -> Void)? = nil
 
     func makeNSView(context: Context) -> NSScrollView {
         let scroll = NSTextView.scrollableTextView()
@@ -37,10 +39,13 @@ struct PlainTextPane: NSViewRepresentable {
 
         context.coordinator.textView = tv
         context.coordinator.scrollView = scroll
+        context.coordinator.onMagnify = onMagnify
+        context.coordinator.installMagnifyRecognizer(on: tv)
         return scroll
     }
 
     func updateNSView(_ scroll: NSScrollView, context: Context) {
+        context.coordinator.onMagnify = onMagnify
         context.coordinator.render(
             lines: lines,
             liveText: liveText,
@@ -57,8 +62,34 @@ struct PlainTextPane: NSViewRepresentable {
     final class Coordinator: NSObject, NSTextViewDelegate {
         weak var textView: NSTextView?
         weak var scrollView: NSScrollView?
+        var onMagnify: ((Double) -> Void)?
+        private var magnifyAccum: CGFloat = 0
+
+        /// 触控板双指捏合调字号
+        func installMagnifyRecognizer(on view: NSView) {
+            let r = NSMagnificationGestureRecognizer(target: self, action: #selector(handleMagnify(_:)))
+            view.addGestureRecognizer(r)
+        }
+
+        @objc private func handleMagnify(_ g: NSMagnificationGestureRecognizer) {
+            switch g.state {
+            case .began:
+                magnifyAccum = 0
+            case .changed:
+                // 每累计 0.12 的缩放量算一步，避免过于灵敏
+                let total = magnifyAccum + g.magnification
+                let steps = (total / 0.12).rounded(.towardZero)
+                if steps != 0 {
+                    onMagnify?(Double(steps))
+                    magnifyAccum = total - steps * 0.12
+                }
+            default:
+                magnifyAccum = 0
+            }
+        }
 
         private var lastRendered = ""
+        private var lastFontSize: Double = 0
         private var userIsSelecting = false
 
         func render(lines: [TranscriptLine], liveText: [Speaker: String],
@@ -67,13 +98,10 @@ struct PlainTextPane: NSViewRepresentable {
 
             let attr = build(lines: lines, liveText: liveText, fontSize: fontSize)
             let newText = attr.string
-            guard newText != lastRendered else {
-                // 文字没变，但字号可能变了
-                if abs((tv.font?.pointSize ?? 0) - fontSize) > 0.5 {
-                    tv.textStorage?.setAttributedString(attr)
-                }
-                return
-            }
+            let fontChanged = abs(lastFontSize - fontSize) > 0.01
+
+            // 文字和字号都没变 → 什么都不做（避免无谓重绘打断选区）
+            guard newText != lastRendered || fontChanged else { return }
 
             // 关键：记录并恢复选区，让用户选中的文字在实时追加时不被清掉
             let savedRange = tv.selectedRange()
@@ -82,6 +110,7 @@ struct PlainTextPane: NSViewRepresentable {
 
             tv.textStorage?.setAttributedString(attr)
             lastRendered = newText
+            lastFontSize = fontSize
 
             if hadSelection, savedRange.location + savedRange.length <= newText.utf16.count {
                 tv.setSelectedRange(savedRange)
