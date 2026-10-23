@@ -74,12 +74,18 @@ private struct ContentBody: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
 
-            Button {
-                state.toggleCaption()
-            } label: {
-                Image(systemName: state.showCaptionPanel ? "rectangle.on.rectangle.fill" : "rectangle.on.rectangle")
+            // 字幕浮窗开关：默认关闭，由用户决定是否开启
+            Toggle(isOn: Binding(
+                get: { state.showCaptionPanel },
+                set: { _ in state.toggleCaption() }
+            )) {
+                Label("字幕浮窗", systemImage: state.showCaptionPanel
+                      ? "rectangle.on.rectangle.fill"
+                      : "rectangle.on.rectangle")
             }
-            .help("字幕浮窗（⇧⌘K）— 可以叠在会议窗口上")
+            .toggleStyle(.button)
+            .controlSize(.large)
+            .help("把字幕变成一个置顶浮窗，叠在会议窗口上（⇧⌘K）")
 
             Menu {
                 Toggle("采集系统声音（对方）", isOn: $state.captureSystem)

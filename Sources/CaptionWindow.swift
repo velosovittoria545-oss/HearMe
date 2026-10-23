@@ -38,11 +38,23 @@ final class CaptionWindowController: NSWindowController {
         hosting = NSHostingView(rootView: CaptionView(store: store))
         win.contentView = hosting
 
+        // 恢复上次位置，但必须满足两个条件：
+        //   1. 那块区域还在某个屏幕上（换显示器后旧坐标可能完全落到屏幕外）
+        //   2. 它在鼠标当前所在的屏幕上（多屏时不要把浮窗丢到另一块屏）
+        let mouse = NSEvent.mouseLocation
+        let activeScreen = NSScreen.screens.first { $0.frame.contains(mouse) } ?? NSScreen.main
+
         if let saved = UserDefaults.standard.string(forKey: "captionFrame") {
             let r = NSRectFromString(saved)
-            if r.width > 200, r.height > 60 { win.setFrame(r, display: false) } else { positionAtBottom() }
+            let onScreen = NSScreen.screens.contains { $0.visibleFrame.intersects(r) }
+            let onActive = activeScreen?.visibleFrame.intersects(r) ?? false
+            if r.width > 200, r.height > 60, onScreen, onActive {
+                win.setFrame(r, display: false)
+            } else {
+                positionAtBottom(on: activeScreen)
+            }
         } else {
-            positionAtBottom()
+            positionAtBottom(on: activeScreen)
         }
 
         NotificationCenter.default.addObserver(
@@ -55,11 +67,24 @@ final class CaptionWindowController: NSWindowController {
 
     required init?(coder: NSCoder) { fatalError() }
 
-    private func positionAtBottom() {
-        guard let win = window, let screen = NSScreen.main else { return }
-        let f = screen.visibleFrame
-        let size = win.frame.size
-        win.setFrameOrigin(NSPoint(x: f.midX - size.width / 2, y: f.minY + 8))
+    private func positionAtBottom(on screen: NSScreen? = nil) {
+        guard let win = window else { return }
+        let target = screen
+            ?? NSScreen.screens.first { $0.frame.contains(NSEvent.mouseLocation) }
+            ?? NSScreen.main
+        guard let f = target?.visibleFrame else { return }
+
+        // 尺寸也限制在该屏内，避免超出
+        var size = win.frame.size
+        size.width = min(size.width, f.width - 40)
+        size.height = min(size.height, f.height - 40)
+
+        win.setFrame(NSRect(
+            x: f.midX - size.width / 2,
+            y: f.minY + 8,
+            width: size.width,
+            height: size.height
+        ), display: false)
     }
 
     override func showWindow(_ sender: Any?) {
